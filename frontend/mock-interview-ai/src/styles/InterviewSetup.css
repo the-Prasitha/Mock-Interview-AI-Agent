@@ -1,0 +1,54 @@
+.setup-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right,
+      rgba(139,92,246,0.25),
+      transparent 35%),
+    #030617;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.setup-card {
+  width: 600px;
+  background: rgba(10,18,45,0.85);
+  border-radius: 30px;
+  padding: 50px;
+  color: white;
+  box-shadow: 0 0 30px rgba(59,130,246,0.15);
+}
+
+.setup-card h1 {
+  margin-bottom: 35px;
+  text-align: center;
+}
+
+.setup-card input {
+  width: 100%;
+  margin-bottom: 25px;
+  padding: 18px;
+  border-radius: 15px;
+  border: none;
+  background: #172033;
+  color: white;
+  font-size: 18px;
+}
+
+.setup-card button {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #9333ea
+    );
+
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}

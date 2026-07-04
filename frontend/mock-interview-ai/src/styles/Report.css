@@ -1,0 +1,25 @@
+.report-page {
+  min-height: 100vh;
+  background: #030617;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.report-card {
+  width: 900px;
+  background: #0f172a;
+  color: white;
+  border-radius: 30px;
+  padding: 50px;
+}
+
+.report-card h1 {
+  margin-bottom: 30px;
+}
+
+.report-card pre {
+  white-space: pre-wrap;
+  line-height: 2;
+  color: #cbd5e1;
+}

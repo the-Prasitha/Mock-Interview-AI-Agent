@@ -1,0 +1,178 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #030617;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.landing-container {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right,
+      rgba(139, 92, 246, 0.25),
+      transparent 35%),
+    radial-gradient(circle at bottom left,
+      rgba(59, 130, 246, 0.25),
+      transparent 35%),
+    #030617;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.hero-card {
+  width: 100%;
+  max-width: 1200px;
+
+  background: rgba(10, 18, 45, 0.8);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-radius: 35px;
+
+  backdrop-filter: blur(20px);
+
+  padding: 60px;
+  text-align: center;
+
+  box-shadow:
+      0 0 40px rgba(59,130,246,0.15);
+}
+
+.robot-icon {
+  font-size: 70px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 72px;
+  color: white;
+  font-weight: 700;
+}
+
+.title span {
+  background: linear-gradient(
+      90deg,
+      #3b82f6,
+      #c026d3
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  margin-top: 15px;
+  color: #cbd5e1;
+  font-size: 28px;
+}
+
+.upload-box {
+  margin-top: 60px;
+
+  border: 2px dashed
+      rgba(255,255,255,0.1);
+
+  border-radius: 25px;
+
+  padding: 50px;
+
+  background:
+      rgba(20,25,55,0.6);
+}
+
+.upload-box h2 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+.upload-box p {
+  color: #94a3b8;
+}
+
+.upload-box input {
+  margin-top: 30px;
+  color: white;
+}
+
+.filename {
+  margin-top: 20px;
+  color: white !important;
+}
+
+.upload-btn {
+  width: 100%;
+  margin-top: 35px;
+
+  padding: 18px;
+
+  border: none;
+  border-radius: 15px;
+
+  background:
+      linear-gradient(
+          90deg,
+          #2563eb,
+          #9333ea
+      );
+
+  color: white;
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.upload-btn:hover {
+  transform: scale(1.02);
+}
+
+.features {
+  display: flex;
+  gap: 25px;
+  margin-top: 45px;
+}
+
+.feature-card {
+  flex: 1;
+
+  background:
+      rgba(255,255,255,0.05);
+
+  border-radius: 20px;
+
+  padding: 25px;
+
+  color: white;
+}
+
+.feature-card h4 {
+  margin-top: 15px;
+}
+
+.feature-card p {
+  color: #94a3b8;
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 48px;
+  }
+
+  .subtitle {
+    font-size: 20px;
+  }
+
+  .features {
+    flex-direction: column;
+  }
+}
