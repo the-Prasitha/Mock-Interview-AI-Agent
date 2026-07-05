@@ -138,11 +138,14 @@ function InterviewChat() {
         }
       );
 
-      navigate("/report", {
-        state: {
-          report: res.data.report,
-        },
-      });
+    navigate("/report", {
+  state: {
+    report: res.data.report,
+    scores: res.data.scores,
+    readiness: res.data.readiness,
+    mlPrediction: res.data.mlPrediction,
+  },
+});
     } catch (err) {
       console.log(err);
       alert("Failed to generate report.");
