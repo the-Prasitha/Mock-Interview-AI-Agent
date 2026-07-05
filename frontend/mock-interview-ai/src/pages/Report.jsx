@@ -1,4 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 import "../styles/Report.css";
 
 function Report() {
@@ -9,9 +11,38 @@ function Report() {
   const scores = location.state?.scores;
   const readiness = location.state?.readiness;
 
+  const [rewrite, setRewrite] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const getRewrite = async () => {
+    const answer = prompt(
+      "Paste one of your interview answers:"
+    );
+
+    if (!answer) return;
+
+    try {
+      setLoading(true);
+
+      const res = await axios.post(
+        "http://localhost:5000/api/interview/rewrite",
+        {
+          answer,
+          role: "Software Engineer",
+        }
+      );
+
+      setRewrite(res.data.rewrite);
+    } catch (err) {
+      console.log(err);
+      alert("Failed to generate rewrite.");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="report-container">
-
       <div className="report-header">
         <h1>AI Interview Report</h1>
       </div>
@@ -67,8 +98,26 @@ function Report() {
 
       <div className="feedback-card">
         <h2>Detailed Feedback</h2>
-
         <pre>{report}</pre>
+      </div>
+
+      <div className="feedback-card">
+        <h2>💡 What You Should Have Said</h2>
+
+        <button
+          className="rewrite-btn"
+          onClick={getRewrite}
+        >
+          Generate Better Answer
+        </button>
+
+        {loading && <p>Generating...</p>}
+
+        {rewrite && (
+          <pre className="rewrite-text">
+            {rewrite}
+          </pre>
+        )}
       </div>
 
       <div className="button-container">
@@ -78,7 +127,6 @@ function Report() {
           Retake Interview
         </button>
       </div>
-
     </div>
   );
 }

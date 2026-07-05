@@ -37,6 +37,7 @@
 }
 
 .setup-card button {
+  margin-top: 40px;
   width: 100%;
   padding: 18px;
   border: none;
@@ -51,4 +52,29 @@
   color: white;
   font-size: 20px;
   cursor: pointer;
+}
+.stress-options {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.stress-card {
+  flex: 1;
+  background: #17233d;
+  padding: 18px;
+  border-radius: 18px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.stress-card:hover {
+  transform: translateY(-4px);
+}
+
+.active {
+  border: 2px solid #6366f1;
+  background: #1e293b;
 }

@@ -85,3 +85,23 @@
 .button-container button:hover {
   background: #2563eb;
 }
+.rewrite-btn {
+  background: #6366f1;
+  border: none;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+}
+
+.rewrite-btn:hover {
+  background: #4f46e5;
+}
+
+.rewrite-text {
+  margin-top: 25px;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}

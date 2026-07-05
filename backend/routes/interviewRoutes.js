@@ -3,8 +3,10 @@ const askLLM = require("../services/llmServices");
 const extractScores = require("../services/scoreExtractor");
 const calculateReadiness = require("../services/readinessService");
 const predictReadiness = require("../services/predictServices");
+const db = require("../database/db");
 
 const router = express.Router();
+
 
 // ================= START INTERVIEW =================
 router.post("/start", async (req, res) => {
@@ -14,10 +16,34 @@ router.post("/start", async (req, res) => {
       company,
       role,
       experience,
+      stressLevel,
     } = req.body;
 
+    let interviewerStyle = "";
+
+    if (stressLevel === "friendly") {
+      interviewerStyle = `
+You are a friendly recruiter.
+Be supportive and encouraging.
+Ask questions in a warm and positive manner.
+`;
+    } else if (stressLevel === "busy") {
+      interviewerStyle = `
+You are a busy senior engineer.
+Ask short and direct questions.
+Focus on technical depth.
+`;
+    } else {
+      interviewerStyle = `
+You are a skeptical interviewer.
+Challenge assumptions.
+Ask tradeoffs.
+Push the candidate to justify decisions.
+`;
+    }
+
     const prompt = `
-You are a senior interviewer conducting a real interview.
+${interviewerStyle}
 
 Candidate Resume:
 ${resumeText}
@@ -33,10 +59,9 @@ ${experience}
 
 Instructions:
 1. Ask ONLY ONE question.
-2. Start with an introductory question or a question based on the candidate's projects or skills.
-3. Mix technical and behavioral questions throughout the interview.
-4. Be conversational like a human interviewer.
-5. Never provide answers.
+2. Start with an introductory question or a project-based question.
+3. Never provide answers.
+4. Be conversational.
 `;
 
     const question = await askLLM(prompt);
@@ -44,6 +69,7 @@ Instructions:
     res.json({
       question,
     });
+
   } catch (err) {
     console.log(err);
 
@@ -52,6 +78,7 @@ Instructions:
     });
   }
 });
+
 
 // ================= FOLLOW-UP QUESTIONS =================
 router.post("/chat", async (req, res) => {
@@ -68,12 +95,12 @@ Candidate's Latest Answer:
 ${answer}
 
 Instructions:
-1. Analyze the candidate's latest answer.
+1. Analyze the answer.
 2. Ask ONLY ONE next question.
 3. If the answer is weak, ask a follow-up question.
 4. If the answer is good, move to another technical or behavioral question.
-5. Be conversational like a human interviewer.
-6. Never provide answers.
+5. Never provide answers.
+6. Be conversational.
 `;
 
     const question = await askLLM(prompt);
@@ -81,6 +108,7 @@ Instructions:
     res.json({
       question,
     });
+
   } catch (err) {
     console.log(err);
 
@@ -90,6 +118,7 @@ Instructions:
   }
 });
 
+
 // ================= GENERATE REPORT =================
 router.post("/report", async (req, res) => {
   console.log("REPORT API HIT");
@@ -97,7 +126,7 @@ router.post("/report", async (req, res) => {
   try {
     const { conversation } = req.body;
 
-    // Prevent fake high scores when interview is incomplete
+    // Interview incomplete
     if (!conversation || conversation.trim().length < 100) {
       return res.json({
         report:
@@ -128,7 +157,7 @@ Rules:
 1. Do NOT assume knowledge that was not demonstrated.
 2. If the candidate skipped questions or gave vague answers, assign low scores.
 3. If there is insufficient information, keep scores between 1 and 4.
-4. Give scores above 8 only when the candidate demonstrates strong understanding with correct explanations.
+4. Give scores above 8 only when the candidate demonstrates strong understanding.
 5. Do not be generous.
 
 Return EXACTLY in this format:
@@ -155,6 +184,7 @@ Overall Feedback:
 `;
 
     const report = await askLLM(prompt);
+
     console.log(report);
 
     const scores = extractScores(report);
@@ -173,6 +203,39 @@ Overall Feedback:
       scores.behavioral
     );
 
+    // ================= SAVE TO SQLITE =================
+    db.run(
+      `
+      INSERT INTO interviews
+      (
+        technical,
+        communication,
+        problemSolving,
+        behavioral,
+        readiness,
+        report
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      [
+        scores.technical,
+        scores.communication,
+        scores.problemSolving,
+        scores.behavioral,
+        readiness.score,
+        report,
+      ],
+      (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(
+            "Interview saved to SQLite."
+          );
+        }
+      }
+    );
+
     res.json({
       report,
       scores,
@@ -189,7 +252,31 @@ Overall Feedback:
   }
 });
 
-// ================= ML READINESS TEST ROUTE =================
+
+// ================= INTERVIEW HISTORY =================
+router.get("/history", (req, res) => {
+  db.all(
+    `
+    SELECT *
+    FROM interviews
+    ORDER BY id DESC
+    `,
+    [],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({
+          message:
+            "Failed to fetch history",
+        });
+      }
+
+      res.json(rows);
+    }
+  );
+});
+
+
+// ================= READINESS TEST =================
 router.post("/readiness", async (req, res) => {
   try {
     const {
@@ -214,7 +301,57 @@ router.post("/readiness", async (req, res) => {
     console.log(err);
 
     res.status(500).json({
-      message: "Failed to predict readiness",
+      message:
+        "Failed to predict readiness",
+    });
+  }
+});
+
+
+// ================= WHAT YOU SHOULD HAVE SAID =================
+router.post("/rewrite", async (req, res) => {
+  try {
+    const { answer, role } = req.body;
+
+    const prompt = `
+You are an expert interview coach.
+
+Candidate Answer:
+${answer}
+
+Target Role:
+${role}
+
+Rewrite the answer to make it:
+
+1. Professional
+2. Clear and concise
+3. Highlight the candidate's contribution
+4. Sound interview-ready
+5. Do NOT invent experiences.
+
+Return exactly in this format:
+
+Optimized Answer:
+...
+
+Why It's Better:
+...
+`;
+
+    const rewrite =
+      await askLLM(prompt);
+
+    res.json({
+      rewrite,
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      message:
+        "Failed to rewrite answer",
     });
   }
 });

@@ -12,6 +12,8 @@ function InterviewSetup() {
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
+  const [stressLevel, setStressLevel] =
+    useState("friendly");
 
   const startInterview = async () => {
     try {
@@ -22,12 +24,14 @@ function InterviewSetup() {
           company,
           role,
           experience,
+          stressLevel,
         }
       );
 
       navigate("/chat", {
         state: {
           firstQuestion: res.data.question,
+          role,
         },
       });
     } catch (err) {
@@ -45,23 +49,71 @@ function InterviewSetup() {
           type="text"
           placeholder="Company Name"
           value={company}
-          onChange={(e) => setCompany(e.target.value)}
+          onChange={(e) =>
+            setCompany(e.target.value)
+          }
         />
 
         <input
           type="text"
           placeholder="Role"
           value={role}
-          onChange={(e) => setRole(e.target.value)}
+          onChange={(e) =>
+            setRole(e.target.value)
+          }
         />
 
         <input
           type="text"
-          placeholder="Experience (Fresher / 1 Year)"
+          placeholder="Experience"
           value={experience}
-          onChange={(e) => setExperience(e.target.value)}
+          onChange={(e) =>
+            setExperience(e.target.value)
+          }
         />
 
+        <div className="stress-options">
+
+  <div
+    className={
+      stressLevel === "friendly"
+        ? "stress-card active"
+        : "stress-card"
+    }
+    onClick={() =>
+      setStressLevel("friendly")
+    }
+  >
+    🟢 Friendly Recruiter
+  </div>
+
+  <div
+    className={
+      stressLevel === "busy"
+        ? "stress-card active"
+        : "stress-card"
+    }
+    onClick={() =>
+      setStressLevel("busy")
+    }
+  >
+    🔵 Busy Engineer
+  </div>
+
+  <div
+    className={
+      stressLevel === "skeptical"
+        ? "stress-card active"
+        : "stress-card"
+    }
+    onClick={() =>
+      setStressLevel("skeptical")
+    }
+  >
+    🔴 Skeptical Interviewer
+  </div>
+
+</div>
         <button onClick={startInterview}>
           Start Interview →
         </button>
