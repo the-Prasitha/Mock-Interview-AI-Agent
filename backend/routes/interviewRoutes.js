@@ -3,10 +3,9 @@ const askLLM = require("../services/llmServices");
 const extractScores = require("../services/scoreExtractor");
 const calculateReadiness = require("../services/readinessService");
 const predictReadiness = require("../services/predictServices");
-const db = require("../database/db");
+const Interview = require("../models/Interview");
 
 const router = express.Router();
-
 
 // ================= START INTERVIEW =================
 router.post("/start", async (req, res) => {
@@ -69,7 +68,6 @@ Instructions:
     res.json({
       question,
     });
-
   } catch (err) {
     console.log(err);
 
@@ -78,7 +76,6 @@ Instructions:
     });
   }
 });
-
 
 // ================= FOLLOW-UP QUESTIONS =================
 router.post("/chat", async (req, res) => {
@@ -108,7 +105,6 @@ Instructions:
     res.json({
       question,
     });
-
   } catch (err) {
     console.log(err);
 
@@ -118,7 +114,6 @@ Instructions:
   }
 });
 
-
 // ================= GENERATE REPORT =================
 router.post("/report", async (req, res) => {
   console.log("REPORT API HIT");
@@ -126,7 +121,6 @@ router.post("/report", async (req, res) => {
   try {
     const { conversation } = req.body;
 
-    // Interview incomplete
     if (!conversation || conversation.trim().length < 100) {
       return res.json({
         report:
@@ -185,8 +179,6 @@ Overall Feedback:
 
     const report = await askLLM(prompt);
 
-    console.log(report);
-
     const scores = extractScores(report);
 
     const readiness = calculateReadiness(
@@ -203,38 +195,17 @@ Overall Feedback:
       scores.behavioral
     );
 
-    // ================= SAVE TO SQLITE =================
-    db.run(
-      `
-      INSERT INTO interviews
-      (
-        technical,
-        communication,
-        problemSolving,
-        behavioral,
-        readiness,
-        report
-      )
-      VALUES (?, ?, ?, ?, ?, ?)
-      `,
-      [
-        scores.technical,
-        scores.communication,
-        scores.problemSolving,
-        scores.behavioral,
-        readiness.score,
-        report,
-      ],
-      (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(
-            "Interview saved to SQLite."
-          );
-        }
-      }
-    );
+    // ===== SAVE TO MONGODB =====
+    await Interview.create({
+      technical: scores.technical,
+      communication: scores.communication,
+      problemSolving: scores.problemSolving,
+      behavioral: scores.behavioral,
+      readiness: readiness.score,
+      report,
+    });
+
+    console.log("Interview saved to MongoDB.");
 
     res.json({
       report,
@@ -242,7 +213,6 @@ Overall Feedback:
       readiness,
       mlPrediction,
     });
-
   } catch (err) {
     console.log(err);
 
@@ -252,29 +222,23 @@ Overall Feedback:
   }
 });
 
-
 // ================= INTERVIEW HISTORY =================
-router.get("/history", (req, res) => {
-  db.all(
-    `
-    SELECT *
-    FROM interviews
-    ORDER BY id DESC
-    `,
-    [],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({
-          message:
-            "Failed to fetch history",
-        });
-      }
+router.get("/history", async (req, res) => {
+  try {
+    const interviews =
+      await Interview.find().sort({
+        createdAt: -1,
+      });
 
-      res.json(rows);
-    }
-  );
+    res.json(interviews);
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      message: "Failed to fetch history",
+    });
+  }
 });
-
 
 // ================= READINESS TEST =================
 router.post("/readiness", async (req, res) => {
@@ -296,7 +260,6 @@ router.post("/readiness", async (req, res) => {
     res.json({
       readiness: result,
     });
-
   } catch (err) {
     console.log(err);
 
@@ -306,7 +269,6 @@ router.post("/readiness", async (req, res) => {
     });
   }
 });
-
 
 // ================= WHAT YOU SHOULD HAVE SAID =================
 router.post("/rewrite", async (req, res) => {
@@ -345,7 +307,6 @@ Why It's Better:
     res.json({
       rewrite,
     });
-
   } catch (err) {
     console.log(err);
 
