@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/UploadResume.css";
+import { API } from "../services/api";
 
 function UploadResume() {
   const [file, setFile] = useState(null);
@@ -22,7 +23,7 @@ function UploadResume() {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/resume/upload",
+        `${API}/api/resume/upload`,
         formData
       );
 

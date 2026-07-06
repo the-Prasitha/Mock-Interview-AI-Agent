@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/InterviewChat.css";
+import { API } from "../services/api";
 
 function InterviewChat() {
   const location = useLocation();
@@ -94,7 +95,7 @@ function InterviewChat() {
         .join("\n");
 
       const res = await axios.post(
-        "http://localhost:5000/api/interview/chat",
+        `${API}/api/interview/chat`,
         {
           history,
           answer,
@@ -132,7 +133,7 @@ function InterviewChat() {
         .join("\n");
 
       const res = await axios.post(
-        "http://localhost:5000/api/interview/report",
+        `${API}/api/interview/report`,
         {
           conversation,
         }

@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import "../styles/Report.css";
+import { API } from "../services/api";
 
 function Report() {
   const location = useLocation();
@@ -25,7 +26,7 @@ function Report() {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/interview/rewrite",
+        `${API}/api/interview/rewrite`,
         {
           answer,
           role: "Software Engineer",

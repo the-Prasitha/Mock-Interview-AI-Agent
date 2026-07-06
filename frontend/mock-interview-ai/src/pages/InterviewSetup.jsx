@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/InterviewSetup.css";
+import { API } from "../services/api";
 
 function InterviewSetup() {
   const location = useLocation();
@@ -18,7 +19,7 @@ function InterviewSetup() {
   const startInterview = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/interview/start",
+  `${API}/api/interview/start`,
         {
           resumeText,
           company,
