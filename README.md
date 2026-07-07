@@ -119,17 +119,6 @@ These metrics are analyzed to estimate the candidate's overall placement readine
 
 ---
 
-## 🔮 Future Enhancements
-
-- Real-time voice conversation with AI
-- Coding interview environment
-- Interactive system design whiteboard
-- Personalized learning resource recommendations
-- Company-specific interview preparation
-- Facial expression and confidence analysis
-
----
-
 ## 👨‍💻 Author
 
 **Prasitha Selvaraj**
